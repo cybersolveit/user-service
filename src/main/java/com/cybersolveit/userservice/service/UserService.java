@@ -39,4 +39,38 @@ public class UserService {
         log.info("Searching the user with id: {}",userId);
         return userRepo.findById(userId);
     }
+
+    public User updateUser(Long userId, UserDto userDto) {
+
+        /// get the user with the help of id
+        Optional<User> existingUserOptional = userRepo.findById(userId);
+        if(existingUserOptional.isPresent()){
+           User existingUser= existingUserOptional.get();
+           existingUser.setLastName(userDto.getLastName());
+           existingUser.setEmail(userDto.getEmail());
+           existingUser.setFirstName(userDto.getFirstName());
+           return userRepo.save(existingUser);
+        }else{
+            log.info("User not found in the database with id: "+userId);
+            return null;
+        }
+
+
+    }
+
+    public String deleteUser(Long userId) {
+       Optional<User> userExist=userRepo.findById(userId);
+
+       if(userExist.isPresent()){
+           userRepo.deleteById(userId);
+           return "User deleted Successfully";
+
+       }else {
+           return "User not found in database";
+       }
+    }
+
+    public Optional<User> findUserByEmail(String email) {
+        return userRepo.findByEmail(email);
+    }
 }

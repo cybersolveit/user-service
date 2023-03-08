@@ -4,6 +4,7 @@ package com.cybersolveit.userservice.controller;
 import com.cybersolveit.userservice.dto.ApiResponse;
 import com.cybersolveit.userservice.dto.UserDto;
 import com.cybersolveit.userservice.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,13 @@ public class UserController {
     // create a service class and create all method that will have business logic
     //    to save,delete, update, and getAllstudent, getStudent, getStudentByEMail
 
+/// add the validation dependency, add validation rule
+
+    // we have to apply the validation where we want
+    // catch the errors and return response
+
+
+
 
     @Autowired
     private UserService userService;
@@ -46,10 +54,10 @@ public class UserController {
 
     //method to save the user
     // url http://localhost:8082/api/v1/user
-    @PostMapping("/user")
-    public ApiResponse createUser(@RequestBody UserDto userDto){
-        System.out.printf("inside controller");
 
+    // swagger api, how to apply swagger , just add dependency
+    @PostMapping("/user")
+    public ApiResponse createUser(@Valid @RequestBody  UserDto userDto){
         return userService.saveUser(userDto);
     }
 
@@ -85,7 +93,7 @@ public class UserController {
 
 
     @PutMapping("/user/{userId}")
-    public ApiResponse updateUserById(@PathVariable Long userId, @RequestBody UserDto userDto){
+    public ApiResponse updateUserById(@PathVariable Long userId, @Valid @RequestBody UserDto userDto){
        return userService.updateUser(userId,userDto);
     }
 

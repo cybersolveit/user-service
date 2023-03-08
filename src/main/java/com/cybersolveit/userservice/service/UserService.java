@@ -26,22 +26,33 @@ public class UserService {
         System.out.println("inside service");
         ApiResponse apiResponse= new ApiResponse();
         User user= new User();
-        user.setEmail(userDto.getEmail());
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        try {
+        Optional<User> userByEmail = userRepo.findByEmail(userDto.getEmail());
+        // if user is present then returh some error
+        // if not then only save the user
+        if(userByEmail.isPresent()){
+//            return error set the  erorr in api response
+//            return null;
+            //swagger or open api
 
-            User savedUser = userRepo.save(user);
-            apiResponse.setData(savedUser);
-            apiResponse.setMessage("User with id "+savedUser.getUser_id()+" created successfully.");
-            apiResponse.setStatusCode(HttpStatus.OK.value());
+        } else {
 
-        } catch (Exception e){
+            user.setEmail(userDto.getEmail());
+            user.setFirstName(userDto.getFirstName());
+            user.setLastName(userDto.getLastName());
+            try {
 
-            // throw some exception
-            throw new UserServiceException(e.getMessage());
+                User savedUser = userRepo.save(user);
+                apiResponse.setData(savedUser);
+                apiResponse.setMessage("User with id " + savedUser.getUser_id() + " created successfully.");
+                apiResponse.setStatusCode(HttpStatus.OK.value());
+
+            } catch (Exception e) {
+
+                // throw some exception
+                throw new UserServiceException(e.getMessage());
 
 
+            }
         }
         return apiResponse;
 

@@ -2,6 +2,8 @@ package com.cybersolveit.userservice.service;
 
 
 import com.cybersolveit.userservice.dto.ApiResponse;
+import com.cybersolveit.userservice.dto.StudentDto;
+import com.cybersolveit.userservice.dto.StudentResponse;
 import com.cybersolveit.userservice.dto.UserDto;
 import com.cybersolveit.userservice.exception.UserNotFoundException;
 import com.cybersolveit.userservice.exception.UserServiceException;
@@ -10,9 +12,13 @@ import com.cybersolveit.userservice.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -21,6 +27,10 @@ public class UserService {
 
     @Autowired
     private UserRepo userRepo;
+
+
+    @Autowired
+    private RestTemplate restTemplate;
     public ApiResponse saveUser (UserDto userDto){
         // business login
         System.out.println("inside service");
@@ -40,9 +50,37 @@ public class UserService {
             user.setFirstName(userDto.getFirstName());
             user.setLastName(userDto.getLastName());
             try {
+                Map<String,Object> responseHashmap= new HashMap<>();
 
                 User savedUser = userRepo.save(user);
-                apiResponse.setData(savedUser);
+
+//                *************************
+                StudentDto studentDto= new StudentDto();
+                studentDto.setEmail(savedUser.getEmail());
+                studentDto.setCourse(userDto.getCourse());
+                studentDto.setAddedBy(userDto.getEmail());
+                studentDto.setFirstName(savedUser.getFirstName());
+                studentDto.setLastName(savedUser.getLastName());
+                /// "{
+                //    "studentId": 4,
+                //    "email": "nab1@gmail.com",
+                //    "firstName": "Nabin1",
+                //    "lastName": "Singh1",
+                //    "course": "Java",
+                //    "addedBy": null
+                //}
+
+                ResponseEntity<StudentResponse> studentResponseEntity = restTemplate.postForEntity("http://localhost:8082/students", studentDto, StudentResponse.class);
+                if(studentResponseEntity.getStatusCode()==HttpStatus.OK){
+                    StudentResponse studentResponse= studentResponseEntity.getBody();
+                    responseHashmap.put("student",studentResponse);
+                    responseHashmap.put("user",savedUser);
+
+                }
+
+
+//                        *******************
+                apiResponse.setData(responseHashmap);
                 apiResponse.setMessage("User with id " + savedUser.getUser_id() + " created successfully.");
                 apiResponse.setStatusCode(HttpStatus.OK.value());
 
@@ -60,7 +98,9 @@ public class UserService {
 
 
     public ApiResponse getAllUsers() {
+        log.info("before break point");
         ApiResponse apiResponse= new ApiResponse();
+        log.info("after break point");
         List<User> users= userRepo.findAll();
         if(users.isEmpty()){
             apiResponse.setErrors("No Users available");

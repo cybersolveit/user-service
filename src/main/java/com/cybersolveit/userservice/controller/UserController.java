@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
@@ -40,7 +41,7 @@ public class UserController {
     // we have to apply the validation where we want
     // catch the errors and return response
 
-
+// WebClient , RestTemplate
 
 
     @Autowired

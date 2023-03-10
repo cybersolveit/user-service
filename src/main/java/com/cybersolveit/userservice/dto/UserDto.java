@@ -24,4 +24,7 @@ public class UserDto {
 
     @NotBlank(message = "lastname should not be blank")
     private String lastName;
+
+    @NotBlank(message = "Course cannot be blank")
+    private String course;
 }
